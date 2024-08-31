@@ -338,60 +338,67 @@
       return document.createTextNode(json);
     }
 
-    const element = document.createElement(json.type || 'div');
+    let element;
 
-    if (json.text) {
-      element.textContent = json.text;
+    switch (json.type) {
+      case 'bubble':
+        element = document.createElement('div');
+        element.style.border = '1px solid #ddd';
+        element.style.borderRadius = '8px';
+        element.style.overflow = 'hidden';
+        break;
+      case 'box':
+        element = document.createElement('div');
+        element.style.display = 'flex';
+        element.style.flexDirection = json.layout === 'vertical' ? 'column' : 'row';
+        break;
+      case 'button':
+        element = document.createElement('button');
+        element.textContent = json.action.label;
+        element.style.padding = '8px 16px';
+        element.style.margin = '4px';
+        element.style.backgroundColor = '#4CAF50';
+        element.style.color = 'white';
+        element.style.border = 'none';
+        element.style.borderRadius = '4px';
+        element.style.cursor = 'pointer';
+        break;
+      case 'image':
+        element = document.createElement('img');
+        element.src = json.url || '/api/placeholder/400/320';
+        element.alt = json.altText || 'Image';
+        break;
+      case 'text':
+        element = document.createElement('p');
+        element.textContent = json.text;
+        break;
+      default:
+        element = document.createElement('div');
     }
 
+    // Apply common styles and properties
+    if (json.backgroundColor) element.style.backgroundColor = json.backgroundColor;
+    if (json.borderColor) element.style.borderColor = json.borderColor;
+    if (json.borderWidth) element.style.borderWidth = `${json.borderWidth}px`;
+    if (json.cornerRadius) element.style.borderRadius = `${json.cornerRadius}px`;
+    if (json.width) element.style.width = json.width === 'full' ? '100%' : `${json.width}px`;
+    if (json.height) element.style.height = json.height === 'full' ? '100%' : `${json.height}px`;
+    if (json.margin) element.style.margin = `${json.margin}px`;
+    if (json.padding) element.style.padding = `${json.padding}px`;
+    if (json.flex) element.style.flex = json.flex;
+    if (json.alignItems) element.style.alignItems = json.alignItems;
+    if (json.justifyContent) element.style.justifyContent = json.justifyContent;
+
+    // Handle nested elements
+    if (json.header) element.appendChild(createElementFromJson(json.header));
+    if (json.hero) element.appendChild(createElementFromJson(json.hero));
+    if (json.body) element.appendChild(createElementFromJson(json.body));
+    if (json.footer) element.appendChild(createElementFromJson(json.footer));
+    
     if (json.contents) {
       json.contents.forEach(child => {
         element.appendChild(createElementFromJson(child));
       });
-    } else if (json.body) {
-      element.appendChild(createElementFromJson(json.body));
-    } else if (json.children) {
-      json.children.forEach(child => {
-        element.appendChild(createElementFromJson(child));
-      });
-    }
-
-    // Handle specific Flex Message properties
-    if (json.layout) {
-      element.style.display = 'flex';
-      element.style.flexDirection = json.layout === 'vertical' ? 'column' : 'row';
-    }
-
-    if (json.backgroundColor) {
-      element.style.backgroundColor = json.backgroundColor;
-    }
-
-    if (json.paddingAll) {
-      element.style.padding = `${json.paddingAll}px`;
-    }
-
-    if (json.cornerRadius) {
-      element.style.borderRadius = `${json.cornerRadius}px`;
-    }
-
-    if (json.width) {
-      element.style.width = json.width === 'full' ? '100%' : `${json.width}px`;
-    }
-
-    if (json.height) {
-      element.style.height = json.height === 'full' ? '100%' : `${json.height}px`;
-    }
-
-    if (json.margin) {
-      element.style.margin = `${json.margin}px`;
-    }
-
-    if (json.alignItems) {
-      element.style.alignItems = json.alignItems;
-    }
-
-    if (json.justifyContent) {
-      element.style.justifyContent = json.justifyContent;
     }
 
     // Handle action property
