@@ -169,6 +169,11 @@
         border-radius: 10px;
       }
     }
+    #flex-show {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 10px;
+}
   </style>
 </head>
 
@@ -225,7 +230,7 @@
         <div class="col-md-5 rounded"
           style="background-color: #849ebf;background-image: url(./line\ bg.jpg);background-size: contain;overflow: auto;">
           <div class="reset-this">
-            <div id="flex-show" style="padding-top: 10px;">
+            <div id="flex-show" style="width: 300px; margin: auto;"></div>
               <div class="text-light w-100 text-center my-3">
                 พื้นที่แสดงตัวอย่าง Flex จะปรากฏที่นี่
               </div>
@@ -292,6 +297,23 @@
     </script> -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
+    function displayMultipleFlexMessages(flexMessages) {
+  const wrapper = document.createElement('div');
+  wrapper.style.display = 'flex';
+  wrapper.style.flexWrap = 'wrap';
+  wrapper.style.justifyContent = 'center';
+  wrapper.style.gap = '20px';
+
+  flexMessages.forEach(flex => {
+    const flexContainer = document.createElement('div');
+    flex2html(flexContainer.id, flex);
+    wrapper.appendChild(flexContainer);
+  });
+
+  document.getElementById('flex-show').appendChild(wrapper);
+}
+  </script>
+  <script>
     var Toast
     $(document).ready(() => {
       // $.LoadingOverlay("show");
@@ -333,7 +355,11 @@
   const container = document.getElementById(containerId);
   container.innerHTML = '';
 
-  function createElementFromJson(json) {
+  // กำหนดขนาดพื้นฐานสำหรับ Bubble
+  const BUBBLE_WIDTH = 280;
+  const BUBBLE_MAX_HEIGHT = 460;
+
+  function createElementFromJson(json, parentWidth = BUBBLE_WIDTH) {
     if (typeof json === 'string') {
       return document.createTextNode(json);
     }
@@ -343,9 +369,12 @@
     switch (json.type) {
       case 'bubble':
         element = document.createElement('div');
+        element.style.width = `${BUBBLE_WIDTH}px`;
+        element.style.maxHeight = `${BUBBLE_MAX_HEIGHT}px`;
         element.style.border = '1px solid #ddd';
         element.style.borderRadius = '8px';
         element.style.overflow = 'hidden';
+        element.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
         break;
       case 'box':
         element = document.createElement('div');
@@ -362,15 +391,23 @@
         element.style.border = 'none';
         element.style.borderRadius = '4px';
         element.style.cursor = 'pointer';
+        element.style.fontSize = '14px';
         break;
       case 'image':
         element = document.createElement('img');
         element.src = json.url || '/api/placeholder/400/320';
         element.alt = json.altText || 'Image';
+        element.style.maxWidth = '100%';
+        element.style.height = 'auto';
         break;
       case 'text':
         element = document.createElement('p');
         element.textContent = json.text;
+        element.style.margin = '4px 0';
+        element.style.fontSize = json.size === 'xl' ? '18px' : 
+                                 json.size === 'lg' ? '16px' :
+                                 json.size === 'sm' ? '12px' :
+                                 json.size === 'xs' ? '10px' : '14px';
         break;
       default:
         element = document.createElement('div');
@@ -381,23 +418,30 @@
     if (json.borderColor) element.style.borderColor = json.borderColor;
     if (json.borderWidth) element.style.borderWidth = `${json.borderWidth}px`;
     if (json.cornerRadius) element.style.borderRadius = `${json.cornerRadius}px`;
-    if (json.width) element.style.width = json.width === 'full' ? '100%' : `${json.width}px`;
-    if (json.height) element.style.height = json.height === 'full' ? '100%' : `${json.height}px`;
-    if (json.margin) element.style.margin = `${json.margin}px`;
-    if (json.padding) element.style.padding = `${json.padding}px`;
+    if (json.width) {
+      element.style.width = json.width === 'full' ? '100%' : 
+                            typeof json.width === 'string' && json.width.endsWith('%') ? json.width :
+                            `${Math.min(parseInt(json.width), parentWidth)}px`;
+    }
+    if (json.height) {
+      element.style.height = json.height === 'full' ? '100%' : `${json.height}px`;
+    }
+    if (json.margin) element.style.margin = typeof json.margin === 'string' ? json.margin : `${json.margin}px`;
+    if (json.padding) element.style.padding = typeof json.padding === 'string' ? json.padding : `${json.padding}px`;
     if (json.flex) element.style.flex = json.flex;
     if (json.alignItems) element.style.alignItems = json.alignItems;
     if (json.justifyContent) element.style.justifyContent = json.justifyContent;
 
     // Handle nested elements
-    if (json.header) element.appendChild(createElementFromJson(json.header));
-    if (json.hero) element.appendChild(createElementFromJson(json.hero));
-    if (json.body) element.appendChild(createElementFromJson(json.body));
-    if (json.footer) element.appendChild(createElementFromJson(json.footer));
+    const childWidth = element.style.width ? parseInt(element.style.width) : parentWidth;
+    if (json.header) element.appendChild(createElementFromJson(json.header, childWidth));
+    if (json.hero) element.appendChild(createElementFromJson(json.hero, childWidth));
+    if (json.body) element.appendChild(createElementFromJson(json.body, childWidth));
+    if (json.footer) element.appendChild(createElementFromJson(json.footer, childWidth));
     
     if (json.contents) {
       json.contents.forEach(child => {
-        element.appendChild(createElementFromJson(child));
+        element.appendChild(createElementFromJson(child, childWidth));
       });
     }
 
