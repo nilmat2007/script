@@ -374,6 +374,35 @@
       element.style.borderRadius = `${json.cornerRadius}px`;
     }
 
+    if (json.width) {
+      element.style.width = json.width === 'full' ? '100%' : `${json.width}px`;
+    }
+
+    if (json.height) {
+      element.style.height = json.height === 'full' ? '100%' : `${json.height}px`;
+    }
+
+    if (json.margin) {
+      element.style.margin = `${json.margin}px`;
+    }
+
+    if (json.alignItems) {
+      element.style.alignItems = json.alignItems;
+    }
+
+    if (json.justifyContent) {
+      element.style.justifyContent = json.justifyContent;
+    }
+
+    // Handle action property
+    if (json.action) {
+      element.style.cursor = 'pointer';
+      element.onclick = () => {
+        console.log('Action clicked:', json.action);
+        // Here you can implement the actual action handling
+      };
+    }
+
     return element;
   }
 
@@ -494,7 +523,7 @@
   let json = getJSON(true)
   if (json) {
     $('#flex-show').html('')
-    flex2html('flex-show', json.contents || json) // เปลี่ยนตรงนี้
+    flex2html('flex-show', json.contents || json)
   } else {
     $('#flex-show').html(`<div style="color: white; font-size: 1rem; text-align: center; padding-top: 20px">
                     Invalid JSON
@@ -800,19 +829,13 @@
         // flex2html('flex-show', JSON.parse(json))
       })
       $('.show-preview').off('click').click(function () {
-        $('#flex1').html('');
-        let json = JSON.parse($(this).find('p').text())
-        $('#json').val(JSON.stringify(json, undefined, 4))
-        setTimeout(() => {
-          $('#json').trigger('input')
-          setTimeout(() => {
-            $('#json').val('')
-          }, 200);
-        }, 200);
-        $('#json-update').hide()
-        $('#json-copy').hide()
-        $('.modal').modal('show');
-      })
+  $('#flex1').html('');
+  let json = JSON.parse($(this).find('p').text())
+  flex2html('flex1', json)
+  $('#json-update').hide()
+  $('#json-copy').hide()
+  $('.modal').modal('show');
+})
       $('.show-json').off('click').click(function () {
         $('#json-update').show()
         $('#json-copy').show()
