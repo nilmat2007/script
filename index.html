@@ -230,7 +230,7 @@
         <div class="col-md-5 rounded"
           style="background-color: #849ebf;background-image: url(./line\ bg.jpg);background-size: contain;overflow: auto;">
           <div class="reset-this">
-            <div id="flex-show" style="width: 300px; margin: auto;"></div>
+            <div id="flex-show" style="width: auto; margin: auto;"></div>
               <div class="text-light w-100 text-center my-3">
                 พื้นที่แสดงตัวอย่าง Flex จะปรากฏที่นี่
               </div>
@@ -355,30 +355,11 @@
   const container = document.getElementById(containerId);
   container.innerHTML = '';
 
-  // กำหนดขนาดตามมาตรฐานของ LINE Flex Message
-  const BUBBLE_WIDTH = {
-    nano: 200,
-    micro: 230,
-    kilo: 270,
-    mega: 300,
-    giga: 340
-  };
-  const BUBBLE_HEIGHT = {
-    nano: 270,
-    micro: 310,
-    kilo: 370,
-    mega: 410,
-    giga: 460
-  };
+  // กำหนดขนาดพื้นฐานสำหรับ Bubble
+  const BUBBLE_WIDTH = 280;
+  const BUBBLE_MAX_HEIGHT = 460;
 
-  function getBubbleSize(size) {
-    return {
-      width: BUBBLE_WIDTH[size] || BUBBLE_WIDTH.mega,
-      height: BUBBLE_HEIGHT[size] || BUBBLE_HEIGHT.mega
-    };
-  }
-
-  function createElementFromJson(json, parentWidth) {
+  function createElementFromJson(json, parentWidth = BUBBLE_WIDTH) {
     if (typeof json === 'string') {
       return document.createTextNode(json);
     }
@@ -388,34 +369,29 @@
     switch (json.type) {
       case 'bubble':
         element = document.createElement('div');
-        const bubbleSize = getBubbleSize(json.size);
-        element.style.width = `${bubbleSize.width}px`;
-        element.style.maxHeight = `${bubbleSize.height}px`;
+        element.style.width = `${BUBBLE_WIDTH}px`;
+        element.style.maxHeight = `${BUBBLE_MAX_HEIGHT}px`;
         element.style.border = '1px solid #ddd';
         element.style.borderRadius = '8px';
         element.style.overflow = 'hidden';
         element.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-        element.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-        parentWidth = bubbleSize.width; // Update parentWidth for child elements
         break;
       case 'box':
         element = document.createElement('div');
         element.style.display = 'flex';
         element.style.flexDirection = json.layout === 'vertical' ? 'column' : 'row';
-        if (json.backgroundColor) element.style.backgroundColor = json.backgroundColor;
         break;
       case 'button':
         element = document.createElement('button');
         element.textContent = json.action.label;
         element.style.padding = '8px 16px';
         element.style.margin = '4px';
-        element.style.backgroundColor = json.style === 'link' ? 'transparent' : '#4CAF50';
-        element.style.color = json.style === 'link' ? '#007bff' : 'white';
-        element.style.border = json.style === 'link' ? 'none' : '1px solid #4CAF50';
+        element.style.backgroundColor = '#4CAF50';
+        element.style.color = 'white';
+        element.style.border = 'none';
         element.style.borderRadius = '4px';
         element.style.cursor = 'pointer';
         element.style.fontSize = '14px';
-        element.style.textDecoration = json.style === 'link' ? 'underline' : 'none';
         break;
       case 'image':
         element = document.createElement('img');
@@ -423,16 +399,6 @@
         element.alt = json.altText || 'Image';
         element.style.maxWidth = '100%';
         element.style.height = 'auto';
-        if (json.size === 'full') {
-          element.style.width = '100%';
-        } else if (json.size === 'xl' || json.size === '5xl') {
-          element.style.width = '100%';
-          element.style.maxHeight = '200px';
-          element.style.objectFit = 'cover';
-        }
-        if (json.aspectMode === 'cover') {
-          element.style.objectFit = 'cover';
-        }
         break;
       case 'text':
         element = document.createElement('p');
@@ -442,23 +408,6 @@
                                  json.size === 'lg' ? '16px' :
                                  json.size === 'sm' ? '12px' :
                                  json.size === 'xs' ? '10px' : '14px';
-        if (json.weight === 'bold') element.style.fontWeight = 'bold';
-        if (json.color) element.style.color = json.color;
-        if (json.align) element.style.textAlign = json.align;
-        break;
-      case 'separator':
-        element = document.createElement('hr');
-        element.style.margin = '8px 0';
-        element.style.border = 'none';
-        element.style.borderTop = '1px solid #ddd';
-        break;
-      case 'spacer':
-        element = document.createElement('div');
-        element.style.height = json.size === 'xs' ? '4px' :
-                               json.size === 'sm' ? '8px' :
-                               json.size === 'md' ? '16px' :
-                               json.size === 'lg' ? '24px' :
-                               json.size === 'xl' ? '32px' : '16px';
         break;
       default:
         element = document.createElement('div');
@@ -477,34 +426,11 @@
     if (json.height) {
       element.style.height = json.height === 'full' ? '100%' : `${json.height}px`;
     }
-    if (json.margin) {
-      if (typeof json.margin === 'string') {
-        element.style.margin = json.margin;
-      } else if (typeof json.margin === 'object') {
-        element.style.marginTop = json.margin.top ? `${json.margin.top}px` : '0';
-        element.style.marginBottom = json.margin.bottom ? `${json.margin.bottom}px` : '0';
-        element.style.marginLeft = json.margin.start ? `${json.margin.start}px` : '0';
-        element.style.marginRight = json.margin.end ? `${json.margin.end}px` : '0';
-      } else {
-        element.style.margin = `${json.margin}px`;
-      }
-    }
-    if (json.padding) {
-      if (typeof json.padding === 'string') {
-        element.style.padding = json.padding;
-      } else if (typeof json.padding === 'object') {
-        element.style.paddingTop = json.padding.top ? `${json.padding.top}px` : '0';
-        element.style.paddingBottom = json.padding.bottom ? `${json.padding.bottom}px` : '0';
-        element.style.paddingLeft = json.padding.start ? `${json.padding.start}px` : '0';
-        element.style.paddingRight = json.padding.end ? `${json.padding.end}px` : '0';
-      } else {
-        element.style.padding = `${json.padding}px`;
-      }
-    }
+    if (json.margin) element.style.margin = typeof json.margin === 'string' ? json.margin : `${json.margin}px`;
+    if (json.padding) element.style.padding = typeof json.padding === 'string' ? json.padding : `${json.padding}px`;
     if (json.flex) element.style.flex = json.flex;
     if (json.alignItems) element.style.alignItems = json.alignItems;
     if (json.justifyContent) element.style.justifyContent = json.justifyContent;
-    // ... (รวมโค้ดส่วนอื่นๆ จาก artifact ก่อนหน้านี้)
 
     // Handle nested elements
     const childWidth = element.style.width ? parseInt(element.style.width) : parentWidth;
