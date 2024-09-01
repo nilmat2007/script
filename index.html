@@ -375,30 +375,20 @@
         element.style.borderRadius = '8px';
         element.style.overflow = 'hidden';
         element.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-        element.style.marginBottom = '10px';
-        break;
-      case 'carousel':
-        element = document.createElement('div');
-        element.style.display = 'flex';
-        element.style.overflowX = 'auto';
-        element.style.padding = '10px';
-        element.style.background = '#f0f0f0';
-        element.style.borderRadius = '8px';
         break;
       case 'box':
         element = document.createElement('div');
         element.style.display = 'flex';
         element.style.flexDirection = json.layout === 'vertical' ? 'column' : 'row';
-        if (json.backgroundColor) element.style.backgroundColor = json.backgroundColor;
         break;
       case 'button':
         element = document.createElement('button');
         element.textContent = json.action.label;
         element.style.padding = '8px 16px';
         element.style.margin = '4px';
-        element.style.backgroundColor = json.color || '#4CAF50';
-        element.style.color = json.style === 'link' ? json.color || '#4CAF50' : 'white';
-        element.style.border = json.style === 'link' ? 'none' : '1px solid ' + (json.color || '#4CAF50');
+        element.style.backgroundColor = '#4CAF50';
+        element.style.color = 'white';
+        element.style.border = 'none';
         element.style.borderRadius = '4px';
         element.style.cursor = 'pointer';
         element.style.fontSize = '14px';
@@ -409,57 +399,15 @@
         element.alt = json.altText || 'Image';
         element.style.maxWidth = '100%';
         element.style.height = 'auto';
-        if (json.size === 'full') {
-          element.style.width = '100%';
-        } else if (json.size) {
-          element.style.width = json.size;
-        }
-        if (json.aspectRatio) {
-          const [width, height] = json.aspectRatio.split(':');
-          element.style.aspectRatio = width / height;
-        }
-        break;
-      case 'icon':
-        element = document.createElement('img');
-        element.src = json.url || '/api/placeholder/20/20';
-        element.alt = 'Icon';
-        element.style.width = json.size || '20px';
-        element.style.height = json.size || '20px';
-        element.style.flexShrink = '0';
         break;
       case 'text':
         element = document.createElement('p');
         element.textContent = json.text;
         element.style.margin = '4px 0';
-        element.style.fontSize = json.size === 'xxs' ? '10px' :
-                                 json.size === 'xs' ? '12px' :
-                                 json.size === 'sm' ? '14px' :
-                                 json.size === 'md' ? '16px' :
-                                 json.size === 'lg' ? '18px' :
-                                 json.size === 'xl' ? '20px' :
-                                 json.size === 'xxl' ? '22px' :
-                                 json.size === '3xl' ? '24px' :
-                                 json.size === '4xl' ? '26px' :
-                                 json.size === '5xl' ? '28px' : '16px';
-        if (json.weight === 'bold') element.style.fontWeight = 'bold';
-        if (json.color) element.style.color = json.color;
-        if (json.style === 'italic') element.style.fontStyle = 'italic';
-        if (json.decoration === 'underline') element.style.textDecoration = 'underline';
-        if (json.align) element.style.textAlign = json.align;
-        break;
-      case 'separator':
-        element = document.createElement('hr');
-        element.style.margin = '8px 0';
-        element.style.border = 'none';
-        element.style.borderTop = '1px solid #ddd';
-        break;
-      case 'spacer':
-        element = document.createElement('div');
-        element.style.height = json.size === 'xs' ? '4px' :
-                               json.size === 'sm' ? '8px' :
-                               json.size === 'md' ? '16px' :
-                               json.size === 'lg' ? '24px' :
-                               json.size === 'xl' ? '32px' : '16px';
+        element.style.fontSize = json.size === 'xl' ? '18px' : 
+                                 json.size === 'lg' ? '16px' :
+                                 json.size === 'sm' ? '12px' :
+                                 json.size === 'xs' ? '10px' : '14px';
         break;
       default:
         element = document.createElement('div');
@@ -513,236 +461,6 @@
   const flexElement = createElementFromJson(flexContent);
   container.appendChild(flexElement);
 }
-
-// Example usage:
-const exampleFlex = {
-  type: "carousel",
-  contents: [
-    {
-      type: "bubble",
-      hero: {
-        type: "image",
-        url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png",
-        size: "full",
-        aspectRatio: "20:13",
-        aspectMode: "cover"
-      },
-      body: {
-        type: "box",
-        layout: "vertical",
-        contents: [
-          {
-            type: "text",
-            text: "Brown Cafe",
-            weight: "bold",
-            size: "xl"
-          },
-          {
-            type: "box",
-            layout: "baseline",
-            margin: "md",
-            contents: [
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-              },
-              {
-                type: "text",
-                text: "4.0",
-                size: "sm",
-                color: "#999999",
-                margin: "md",
-                flex: 0
-              }
-            ]
-          },
-          {
-            type: "box",
-            layout: "vertical",
-            margin: "lg",
-            spacing: "sm",
-            contents: [
-              {
-                type: "box",
-                layout: "baseline",
-                spacing: "sm",
-                contents: [
-                  {
-                    type: "text",
-                    text: "Place",
-                    color: "#aaaaaa",
-                    size: "sm",
-                    flex: 1
-                  },
-                  {
-                    type: "text",
-                    text: "Miraina Tower, 4-1-6 Shinjuku, Tokyo",
-                    wrap: true,
-                    color: "#666666",
-                    size: "sm",
-                    flex: 5
-                  }
-                ]
-              },
-              {
-                type: "box",
-                layout: "baseline",
-                spacing: "sm",
-                contents: [
-                  {
-                    type: "text",
-                    text: "Time",
-                    color: "#aaaaaa",
-                    size: "sm",
-                    flex: 1
-                  },
-                  {
-                    type: "text",
-                    text: "10:00 - 23:00",
-                    wrap: true,
-                    color: "#666666",
-                    size: "sm",
-                    flex: 5
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      footer: {
-        type: "box",
-        layout: "vertical",
-        spacing: "sm",
-        contents: [
-          {
-            type: "button",
-            style: "link",
-            height: "sm",
-            action: {
-              type: "uri",
-              label: "CALL",
-              uri: "https://linecorp.com"
-            }
-          },
-          {
-            type: "button",
-            style: "link",
-            height: "sm",
-            action: {
-              type: "uri",
-              label: "WEBSITE",
-              uri: "https://linecorp.com"
-            }
-          },
-          {
-            type: "box",
-            layout: "vertical",
-            contents: [],
-            margin: "sm"
-          }
-        ],
-        flex: 0
-      }
-    },
-    {
-      type: "bubble",
-      hero: {
-        type: "image",
-        url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_2_restaurant.png",
-        size: "full",
-        aspectRatio: "20:13",
-        aspectMode: "cover"
-      },
-      body: {
-        type: "box",
-        layout: "vertical",
-        contents: [
-          {
-            type: "text",
-            text: "Boeuf Bourguignon",
-            weight: "bold",
-            size: "xl"
-          },
-          {
-            type: "box",
-            layout: "baseline",
-            margin: "md",
-            contents: [
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-              },
-              {
-                type: "icon",
-                size: "sm",
-                url: "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-              },
-              {
-                type: "text",
-                text: "4.0",
-                size: "sm",
-                color: "#999999",
-                margin: "md",
-                flex: 0
-              }
-            ]
-          },
-          {
-            type: "box",
-            layout: "vertical",
-            margin: "lg",
-            spacing: "sm",
-            contents: [
-              {
-                type: "box",
-                layout: "baseline",
-                spacing: "sm",
-                contents: [
-                  {
-                    type: "text",
-                    text: "Place",
-                    color: "#aaaaaa",
-                    size: "sm",
-                    flex: 1
-                  },
 </script>
   <script>
     const EXPIRE_USERS = [
